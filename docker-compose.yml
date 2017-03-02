@@ -1,0 +1,28 @@
+version: "2"
+
+services:
+  api:
+    container_name: inv_api
+    build: .
+    ports:
+      - "127.0.0.1:34342:5000"
+    volumes:
+      - ./:/app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - POSTGRES_CONN_STRING=Server=postgres;Database=inv_db;User Id=inv_db;Password=secret123
+    links:
+      - postgres
+    command: sh -c "sleep 5 && dotnet ef database update && dotnet run --server.urls http://*:5000"
+    restart: always
+
+  postgres:
+    container_name: inv_db
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=secret123
+      - POSTGRES_USER=inv_db
+      - POSTGRES_DB=inv_db
+    restart: always
+    ports:
+      - 32776:5432
